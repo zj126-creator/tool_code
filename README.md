@@ -9,6 +9,7 @@
 | [batch-rename-tool](batch-rename-tool/) | 批量重命名工具 — 按创建时间自动排序命名 | Python + tkinter | ✅ 可用 |
 | [screenshot-ocr-tool](screenshot-ocr-tool/) | 截图OCR工具 — 截图识别文字、表格、公式，支持翻译导出 | Python + PyQt5 | ✅ 可用 |
 | [pdf-converter-tool](pdf-converter-tool/) | PDF万能转换工具 — 转Word/转图片/合并/拆分/加密等六大功能 | Python + tkinter | ✅ 可用 |
+| [photo-tool](photo-tool/) | 照片处理工具 — 照片压缩 & 标准证件照制作（自动去背景） | Python + tkinter | ✅ 可用 |
 
 > 更多工具持续更新中…
 
