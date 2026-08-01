@@ -1,0 +1,5 @@
+PyQt5>=5.15
+mss>=6.0
+keyboard>=0.13
+openpyxl>=3.0
+requests>=2.20

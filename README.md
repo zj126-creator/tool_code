@@ -7,6 +7,7 @@
 | 工具 | 说明 | 语言 | 状态 |
 |------|------|------|------|
 | [batch-rename-tool](batch-rename-tool/) | 批量重命名工具 — 按创建时间自动排序命名 | Python + tkinter | ✅ 可用 |
+| [screenshot-ocr-tool](screenshot-ocr-tool/) | 截图OCR工具 — 截图识别文字、表格、公式，支持翻译导出 | Python + PyQt5 | ✅ 可用 |
 
 > 更多工具持续更新中…
 

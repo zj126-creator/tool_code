@@ -4,7 +4,7 @@ Batch Rename Tool — 批量重命名工具
 A desktop GUI application for batch renaming files by creation time,
 modification time, or filename, with customizable naming patterns.
 
-Author: QClaw
+Author: zj126-creator
 License: MIT
 Python: 3.8+
 """
