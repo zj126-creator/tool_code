@@ -1,0 +1,138 @@
+/* Popup 弹窗样式 */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 340px;
+  font-family: "Microsoft YaHei", "Segoe UI", sans-serif;
+  font-size: 14px;
+  color: #333;
+}
+
+.popup-container {
+  padding: 0;
+}
+
+.popup-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #1a73e8, #4285f4);
+  color: #fff;
+}
+
+.popup-logo {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+}
+
+.popup-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.popup-body {
+  padding: 16px;
+}
+
+.popup-btn {
+  width: 100%;
+  padding: 10px 16px;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  background: #fff;
+  color: #333;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 8px;
+  font-family: inherit;
+}
+
+.popup-btn:hover {
+  background: #f8f9fa;
+  border-color: #bdc1c6;
+}
+
+.popup-btn.primary {
+  background: #1a73e8;
+  color: #fff;
+  border-color: #1a73e8;
+}
+
+.popup-btn.primary:hover {
+  background: #1557b7;
+}
+
+.popup-divider {
+  height: 1px;
+  background: #e8eaed;
+  margin: 12px 0;
+}
+
+.popup-section {
+  margin-bottom: 8px;
+}
+
+.popup-label {
+  display: block;
+  font-size: 12px;
+  color: #80868b;
+  margin-bottom: 6px;
+}
+
+textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+textarea:focus {
+  border-color: #1a73e8;
+}
+
+.popup-result {
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #1a73e8;
+  min-height: 20px;
+  display: none;
+}
+
+.popup-result.show {
+  display: block;
+}
+
+.popup-tips {
+  font-size: 12px;
+  color: #80868b;
+  line-height: 1.8;
+}
+
+.popup-tips ul {
+  padding-left: 16px;
+  margin-top: 4px;
+}
+
+kbd {
+  background: #e8eaed;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-family: monospace;
+}

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>简体中文翻译助手</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <div class="popup-header">
+      <img src="../icons/icon48.png" alt="Logo" class="popup-logo">
+      <span class="popup-title">简体中文翻译助手</span>
+    </div>
+
+    <div class="popup-body">
+      <button id="btnTranslatePage" class="popup-btn primary">
+        🌐 翻译当前页面
+      </button>
+
+      <button id="btnRestorePage" class="popup-btn">
+        ↩ 恢复原页面
+      </button>
+
+      <div class="popup-divider"></div>
+
+      <div class="popup-section">
+        <label class="popup-label">手动翻译</label>
+        <textarea id="manualInput" placeholder="输入要翻译的文字…" rows="3"></textarea>
+        <button id="btnTranslateText" class="popup-btn">翻译</button>
+        <div id="manualResult" class="popup-result"></div>
+      </div>
+
+      <div class="popup-divider"></div>
+
+      <div class="popup-tips">
+        <div>💡 使用提示：</div>
+        <ul>
+          <li>快捷键 <kbd>Alt+T</kbd> 开关整页翻译</li>
+          <li>选中文字后右键 → 翻译选中文字</li>
+          <li>译文以蓝色显示在原文旁边</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
