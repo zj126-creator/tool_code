@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>对抗性测试</title></head>
+<body>
+
+<!-- BUG-01: 空文档 -->
+<!-- BUG-02: 空段落 -->
+<p></p>
+<p>   </p>
+
+<!-- BUG-03: 超长段落（超出一页） -->
+<p>这是一段超长文本需要测试自动换行和分页是否正确处理。这里有很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字很多文字。</p>
+
+<!-- BUG-04: 仅含空白图片 -->
+<img src="" alt="空图片">
+<img src="nonexistent.jpg" alt="不存在图片">
+
+<!-- BUG-05: 嵌套内联标签 -->
+<p>这是<strong>加粗里<em>斜体里<u>下划线</u>回来</em>回来</strong>回来</p>
+
+<!-- BUG-06: 换行标签 br -->
+<p>第一行<br>第二行<br>第三行</p>
+
+<!-- BUG-07: 连续 br -->
+<p>A<br><br><br>B</p>
+
+<!-- BUG-08: font-size 为 0 -->
+<p style="font-size: 0px;">字号0</p>
+
+<!-- BUG-09: font-size 为极小值 -->
+<p style="font-size: 1px;">字号1px</p>
+
+<!-- BUG-10: 颜色 transparent/inherit/currentColor -->
+<p style="color: transparent;">透明色</p>
+<p style="color: inherit;">继承色</p>
+
+<!-- BUG-11: 表格单元格多段落 -->
+<table>
+  <tr>
+    <td><p>第一段</p><p>第二段</p><p>第三段</p></td>
+    <td>单段</td>
+  </tr>
+</table>
+
+<!-- BUG-12: 深层嵌套列表 -->
+<ul>
+  <li>L1
+    <ul>
+      <li>L2
+        <ul>
+          <li>L3
+            <ul>
+              <li>L4</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<!-- BUG-13: pre 内含 HTML 标签文本 -->
+<pre>
+<div>这是代码中的标签文本</div>
+<span>同理</span>
+</pre>
+
+<!-- BUG-14: 标题内含链接 -->
+<h2><a href="https://example.com">标题链接</a></h2>
+
+<!-- BUG-15: 内联标签包裹纯空白 -->
+<p>前<span>   </span>后</p>
+
+<!-- BUG-16: 连续 h1 -->
+<h1>标题A</h1>
+<h1>标题B</h1>
+
+<!-- BUG-17: blockquote 含列表 -->
+<blockquote>
+  <ul>
+    <li>引用项1</li>
+    <li>引用项2</li>
+  </ul>
+</blockquote>
+
+<!-- BUG-18: font-weight 数字 -->
+<p style="font-weight: 400;">normal</p>
+<p style="font-weight: 700;">bold</p>
+<p style="font-weight: 900;">black</p>
+
+<!-- BUG-19: del/s 标签 -->
+<p>有<del>删除文本</del>和<s>另一删除</s></p>
+
+<!-- BUG-20: 空表格行 -->
+<table>
+  <tr><td>A</td></tr>
+  <tr></tr>
+  <tr><td>B</td></tr>
+</table>
+
+<!-- BUG-21: table 无 thead/tbody -->
+<table>
+  <tr><th>表头1</th><th>表头2</th></tr>
+  <tr><td>数据1</td><td>数据2</td></tr>
+</table>
+
+<!-- BUG-22: 合并单元格 colspan/rowspan -->
+<table>
+  <tr><th colspan="2">合并表头</th></tr>
+  <tr><td rowspan="2">跨行</td><td>A</td></tr>
+  <tr><td>B</td></tr>
+</table>
+
+<!-- BUG-23: ol 有序列表 -->
+<ol>
+  <li>第一项</li>
+  <li>第二项</li>
+  <li>第三项</li>
+</ol>
+
+<!-- BUG-24: 文本节点内含特殊字符 -->
+<p>&lt;script&gt;alert('xss')&lt;/script&gt;</p>
+<p>&amp;符号 &nbsp;空格 &copy;版权</p>
+
+<!-- BUG-25: dl/dt/dd 定义列表 -->
+<dl>
+  <dt>术语</dt>
+  <dd>定义内容</dd>
+</dl>
+
+<!-- BUG-26: 多个图片在同一段落 -->
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" alt="1x1">文字<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" alt="另一个1x1">尾</p>
+
+</body>
+</html>

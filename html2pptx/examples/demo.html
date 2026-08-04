@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>演示文档</title>
+</head>
+<body>
+
+<h1>HTML 转 PPTX 演示</h1>
+
+<p>这是一个从第一性原理出发开发的 HTML→PPTX 转换器。它能将 HTML 内容<strong>一字不差</strong>地转换为<em>可编辑</em>的 PowerPoint 文件。</p>
+
+<h2>核心特性</h2>
+
+<ul>
+  <li>文本内容完整保留，<strong>加粗</strong>、<em>斜体</em>、<u>下划线</u>等格式不丢失</li>
+  <li>字体大小、颜色等样式尽可能保留</li>
+  <li>图片自动嵌入（支持本地/HTTP/data URI）</li>
+  <li>表格结构完整保留
+    <ul>
+      <li>表头特殊样式</li>
+      <li>交替行颜色</li>
+    </ul>
+  </li>
+  <li>列表层级正确映射</li>
+</ul>
+
+<h2>表格示例</h2>
+
+<table border="1">
+  <thead>
+    <tr>
+      <th>功能</th>
+      <th>支持</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>文本</td>
+      <td>✓</td>
+      <td>所有文本内容</td>
+    </tr>
+    <tr>
+      <td>图片</td>
+      <td>✓</td>
+      <td>PNG/JPEG/GIF/WebP</td>
+    </tr>
+    <tr>
+      <td>表格</td>
+      <td>✓</td>
+      <td>完整表格结构</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>代码块</h2>
+
+<pre>
+def hello():
+    print("Hello, World!")
+</pre>
+
+<h2>段落对齐</h2>
+
+<p style="text-align: center;">这段文字居中对齐</p>
+<p style="text-align: right;">这段文字右对齐</p>
+<p style="color: #FF0000; font-size: 20px;">这段文字红色且大号</p>
+
+<h3>第三级标题</h3>
+
+<p>程序会根据内容量自动分页，确保每页内容不过载。所有生成的 PPTX 元素都是<strong>原生可编辑</strong>的，不是截图。</p>
+
+<hr>
+
+<p>感谢使用!</p>
+
+</body>
+</html>

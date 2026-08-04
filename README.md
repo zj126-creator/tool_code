@@ -12,6 +12,8 @@
 | [photo-tool](photo-tool/) | 照片处理工具 — 照片压缩 & 标准证件照制作（自动去背景） | Python + tkinter | ✅ 可用 |
 | [chrome-translate-ext](chrome-translate-ext/) | 简体中文翻译助手 — 外文网页翻译，整页/划词/右键翻译 | Chrome Extension (Manifest V3) | ✅ 可用 |
 
+| [html2pptx](html2pptx/) | HTML转PPTX工具 — 将HTML转为可编辑的PowerPoint文件 | Python + python-pptx | ✅ 可用 |
+
 > 更多工具持续更新中…
 
 ## 📄 许可证
