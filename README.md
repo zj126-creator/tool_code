@@ -14,6 +14,8 @@
 
 | [html2pptx](html2pptx/) | HTML转PPTX工具 — 将HTML转为可编辑的PowerPoint文件 | Python + python-pptx | ✅ 可用 |
 
+| [im-doc-generator](im-doc-generator/) | IM在线文档表生成器 — 从日计划Excel自动生成IM在线文档表 | Python + tkinter | ✅ 可用 |
+
 > 更多工具持续更新中…
 
 ## 📄 许可证
