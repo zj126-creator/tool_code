@@ -16,6 +16,8 @@
 
 | [im-doc-generator](im-doc-generator/) | IM在线文档表生成器 — 从日计划Excel自动生成IM在线文档表 | Python + tkinter | ✅ 可用 |
 
+| [fsrs-trainer](fsrs-trainer/) | FSRS间隔重复学习系统 — 基于FSRS-5.0算法的科学复习工具 | Python + tkinter | ✅ 可用 |
+
 > 更多工具持续更新中…
 
 ## 📄 许可证

@@ -1,0 +1,128 @@
+{
+  "questions": [
+    {
+      "id": "q001",
+      "type": "single",
+      "question": "FSRS 算法的全称是什么？",
+      "options": [
+        "Free Spaced Repetition Scheduler",
+        "Fast Study Review System",
+        "Flashcard Spaced Repetition Standard",
+        "Flexible Study Reminder Software"
+      ],
+      "answer": [0],
+      "explanation": "FSRS = Free Spaced Repetition Scheduler，由 Jarrett Ye 开发的开源间隔重复调度算法。"
+    },
+    {
+      "id": "q002",
+      "type": "single",
+      "question": "FSRS 中可检索性 (Retrievability) 的计算公式是？",
+      "options": [
+        "R = e^(-t/s)",
+        "R = (1 + t/(9*s))^(-1)",
+        "R = 1 - t/s",
+        "R = s / (s + t)"
+      ],
+      "answer": [1],
+      "explanation": "FSRS 使用 R = (1 + t/(9*s))^(-1)，其中 t 是经过天数，s 是稳定性。"
+    },
+    {
+      "id": "q003",
+      "type": "multiple",
+      "question": "以下哪些是 FSRS 的评级 (Rating) 选项？",
+      "options": [
+        "Again",
+        "Hard",
+        "Good",
+        "Easy",
+        "Perfect"
+      ],
+      "answer": [0, 1, 2, 3],
+      "explanation": "FSRS 使用 4 个评级：Again(1)、Hard(2)、Good(3)、Easy(4)，与 Anki 的按钮对应。"
+    },
+    {
+      "id": "q004",
+      "type": "multiple",
+      "question": "FSRS 卡片的核心记忆状态参数包括哪些？",
+      "options": [
+        "Stability (稳定性)",
+        "Difficulty (难度)",
+        "Reps (复习次数)",
+        "Priority (优先级)",
+        "Lapses (遗忘次数)"
+      ],
+      "answer": [0, 1, 2, 4],
+      "explanation": "FSRS 核心参数是 Stability 和 Difficulty，同时跟踪 reps 和 lapses。Priority 不是 FSRS 参数。"
+    },
+    {
+      "id": "q005",
+      "type": "judge",
+      "question": "FSRS 算法的难度 (Difficulty) 取值范围是 [1, 10]。",
+      "options": ["正确", "错误"],
+      "answer": [0],
+      "explanation": "FSRS 将难度钳制在 [1, 10] 范围内，1 表示最容易，10 表示最难。"
+    },
+    {
+      "id": "q006",
+      "type": "judge",
+      "question": "FSRS 中，当用户评为 Again 时，卡片会进入重学 (Relearning) 状态。",
+      "options": ["正确", "错误"],
+      "answer": [0],
+      "explanation": "在 Review 状态下评为 Again，卡片会进入 Relearning 状态，lapses 计数 +1。"
+    },
+    {
+      "id": "q007",
+      "type": "single",
+      "question": "FSRS-5.0 默认配置中使用多少个权重参数 (w)？",
+      "options": ["17", "18", "19", "20"],
+      "answer": [2],
+      "explanation": "FSRS-5.0 使用 19 个权重参数 (w[0] 到 w[18])。"
+    },
+    {
+      "id": "q008",
+      "type": "multiple",
+      "question": "间隔重复学习法相比集中学习的优势有哪些？",
+      "options": [
+        "长期记忆效果更好",
+        "每次学习时间更短",
+        "能自动安排复习时间",
+        "完全不需要主动回忆",
+        "减少遗忘率"
+      ],
+      "answer": [0, 1, 2, 4],
+      "explanation": "间隔重复通过科学安排复习时间提高长期记忆，但仍然需要主动回忆 (active recall)。"
+    },
+    {
+      "id": "q009",
+      "type": "judge",
+      "question": "FSRS 的目标可检索性 (target retention) 越高，复习频率越低。",
+      "options": ["正确", "错误"],
+      "answer": [1],
+      "explanation": "目标可检索性越高（如 95%），复习间隔越短，复习频率越高。默认 90%。"
+    },
+    {
+      "id": "q010",
+      "type": "single",
+      "question": "以下哪个不是 FSRS 卡片的状态 (State)？",
+      "options": ["New", "Learning", "Review", "Suspended"],
+      "answer": [3],
+      "explanation": "FSRS 的 4 种状态是 New、Learning、Review、Relearning。Suspended 是 Anki 的功能而非 FSRS 核心状态。"
+    },
+    {
+      "id": "q011",
+      "type": "single",
+      "question": "在 FSRS 中，新牌评为 Good 后，初始稳定性 s0 等于？",
+      "options": ["w[0]", "w[1]", "w[2]", "w[3]"],
+      "answer": [2],
+      "explanation": "新牌初始稳定性 s0 = w[rating-1]，Good 的 rating=3，所以 s0 = w[2]。"
+    },
+    {
+      "id": "q012",
+      "type": "judge",
+      "question": "FSRS 算法仅适用于 Anki 平台使用。",
+      "options": ["正确", "错误"],
+      "answer": [1],
+      "explanation": "FSRS 是开源算法，已被移植到多个平台（RemNote、Mochi、自定义程序等）。"
+    }
+  ]
+}
