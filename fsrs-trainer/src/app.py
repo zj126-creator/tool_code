@@ -1,4 +1,6 @@
-"""FSRS 间隔重复学习系统 - GUI 主程序"""
+"""FSRS 间隔重复学习系统 - GUI 主程序
+作者：zj126-creator
+"""
 
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
@@ -41,6 +43,10 @@ class FSRSApp:
         self.current_user_answer = []
         self.session_stats = {"done": 0, "ok": 0, "ng": 0}
         self.option_vars = []
+        self.session_queue = []    # 本次学习的题目队列 [(question, card), ...]
+        self.session_index = -1     # 当前在队列中的位置
+        self.answered = False       # 当前题是否已提交答案
+        self._last_rating = None    # 记录上一题的评分，用于上一题回看
         # 撤销
         self._undo_snapshot = None
         self._syncing_days = False
@@ -126,6 +132,8 @@ class FSRSApp:
                   font=Font(family=FF, size=11)).pack(pady=(0, 25))
         ttk.Button(f, text="导入题库（CSV/Excel）",
                    command=self._import_deck).pack(pady=10, ipadx=20, ipady=6)
+        ttk.Label(f, text="作者：zj126-creator",
+                  font=Font(family=FF, size=9), foreground="#999999").pack(pady=(5, 0))
 
         # 题库列表区域
         list_frame = ttk.LabelFrame(f, text="已加载题库", padding=10)
@@ -395,14 +403,22 @@ class FSRSApp:
         d['new_card_ptr'] = 0
         d['current_day'] = 0
         self.session_stats = {"done": 0, "ok": 0, "ng": 0}
+        # 构建本次学习队列
+        self.session_queue = self._get_due()
+        self.session_index = -1
+        if not self.session_queue:
+            self._save_all()
+            self._build_done()
+            return
         self._build_study()
-        self._next_q()
+        self._go_next()
 
     def _build_study(self):
         d = self._active_deck()
         self._clear()
         f = ttk.Frame(self.root, padding=30)
         f.pack(fill="both", expand=True)
+        # 顶部信息栏
         top = ttk.Frame(f)
         top.pack(fill="x", pady=(0, 12))
         deck_name = d['deck_name'] if d else ""
@@ -412,6 +428,7 @@ class FSRSApp:
         self.progress_label.pack(side="right")
         self.stats_top = ttk.Label(top, text="", font=Font(family=FF, size=10))
         self.stats_top.pack(side="right", padx=20)
+        # 题目卡片
         card = tk.Frame(f, bg=CARD_BG, relief="solid", bd=1)
         card.pack(fill="both", expand=True, pady=8)
         self.type_label = tk.Label(card, text="", bg=CARD_BG, font=Font(family=FF, size=9), fg="#888888")
@@ -422,35 +439,67 @@ class FSRSApp:
         self.question_label.pack(fill="x", padx=20, pady=(4, 12))
         self.options_frame = tk.Frame(card, bg=CARD_BG)
         self.options_frame.pack(fill="x", padx=20, pady=(0, 12))
+        # 答案反馈区（提交后显示）
+        self.feedback_frame = tk.Frame(card, bg=CARD_BG)
+        # 评分按钮区（提交后显示）
+        self.rating_frame = tk.Frame(card, bg=CARD_BG)
+        # 底部导航按钮
+        nav = ttk.Frame(f)
+        nav.pack(fill="x", pady=(8, 4))
+        self.prev_btn = ttk.Button(nav, text="◀ 上一题", command=self._go_prev, state="disabled")
+        self.prev_btn.pack(side="left", padx=6)
         self.submit_btn = tk.Button(f, text="提交答案", font=Font(family=FF, size=11),
                                     bg=ACCENT, fg="white", activebackground=ACCENT_H,
                                     activeforeground="white", relief="flat",
                                     command=self._submit, cursor="hand2", padx=25, pady=6)
-        self.submit_btn.pack(pady=8)
-        ttk.Button(f, text="结束本次学习", command=self._end_study).pack(pady=4)
+        self.submit_btn.pack(side="left", padx=6)
+        self.next_btn = ttk.Button(nav, text="下一题 ▶", command=self._go_next, state="disabled")
+        self.next_btn.pack(side="right", padx=6)
+        ttk.Button(nav, text="结束本次学习", command=self._end_study).pack(side="right", padx=6)
 
     def _build_feedback(self):
-        self._clear()
-        f = ttk.Frame(self.root, padding=30)
-        f.pack(fill="both", expand=True)
-        self.result_label = ttk.Label(f, text="", font=Font(family=FF, size=18, weight="bold"))
-        self.result_label.pack(pady=(20, 10))
-        self.ans_label = ttk.Label(f, text="", font=Font(family=FF, size=11), wraplength=650, justify="left")
-        self.ans_label.pack(pady=10)
-        self.explain_label = ttk.Label(f, text="", font=Font(family=FF, size=10), wraplength=650, justify="left")
-        self.explain_label.pack(pady=10)
-        ttk.Separator(f).pack(fill="x", pady=12)
-        ttk.Label(f, text="请评价你的记忆情况（FSRS 将据此安排下次复习）：",
-                  font=Font(family=FF, size=11)).pack(pady=(5, 12))
-        rf = ttk.Frame(f)
-        rf.pack(pady=10)
-        for text, clr, rt in [("忘记了\nAgain", "#e74c3c", Rating.AGAIN),
-                               ("很吃力\nHard", "#f39c12", Rating.HARD),
-                               ("记住了\nGood", "#27ae60", Rating.GOOD),
-                               ("很轻松\nEasy", "#2ecc71", Rating.EASY)]:
-            tk.Button(rf, text=text, font=Font(family=FF, size=11), bg=clr, fg="white",
+        """在当前页面内显示答案反馈和评分按钮（不跳转新页面）"""
+        # 清空旧的反馈区
+        for w in self.feedback_frame.winfo_children():
+            w.destroy()
+        for w in self.rating_frame.winfo_children():
+            w.destroy()
+        # 显示反馈区
+        self.feedback_frame.pack(fill="x", padx=20, pady=(8, 4))
+        ok = self.current_question.check_answer(self.current_user_answer)
+        result_text = "✓ 回答正确！" if ok else "✗ 回答错误！"
+        result_clr = OK_CLR if ok else NG_CLR
+        tk.Label(self.feedback_frame, text=result_text, bg=CARD_BG,
+                 font=Font(family=FF, size=13, weight="bold"), fg=result_clr,
+                 anchor="w").pack(fill="x", pady=(0, 6))
+        ua = " / ".join(self.current_question.options[i] if i < len(self.current_question.options) else str(i) for i in sorted(self.current_user_answer))
+        tk.Label(self.feedback_frame,
+                 text=f"正确答案：{self.current_question.get_correct_text()}",
+                 bg=CARD_BG, font=Font(family=FF, size=11), fg=OK_CLR,
+                 anchor="w", wraplength=620, justify="left").pack(fill="x", pady=2)
+        tk.Label(self.feedback_frame, text=f"你的答案：{ua}",
+                 bg=CARD_BG, font=Font(family=FF, size=11), fg="#555555",
+                 anchor="w", wraplength=620, justify="left").pack(fill="x", pady=2)
+        if self.current_question.explanation:
+            tk.Label(self.feedback_frame, text=f"解析：{self.current_question.explanation}",
+                     bg=CARD_BG, font=Font(family=FF, size=10), fg="#666666",
+                     anchor="w", wraplength=620, justify="left").pack(fill="x", pady=(4, 0))
+        # 评分按钮
+        self.rating_frame.pack(fill="x", padx=20, pady=(8, 12))
+        ttk.Label(self.rating_frame, text="评价记忆情况（FSRS 据此安排复习）：",
+                  style="", background=CARD_BG).pack(anchor="w", pady=(0, 6))
+        rbf = tk.Frame(self.rating_frame, bg=CARD_BG)
+        rbf.pack(fill="x")
+        for text, clr, rt in [("忘记", "#e74c3c", Rating.AGAIN),
+                               ("吃力", "#f39c12", Rating.HARD),
+                               ("记住", "#27ae60", Rating.GOOD),
+                               ("轻松", "#2ecc71", Rating.EASY)]:
+            tk.Button(rbf, text=text, font=Font(family=FF, size=10), bg=clr, fg="white",
                       activebackground=clr, relief="flat", cursor="hand2",
-                      command=lambda r=rt: self._rate(r), width=12, height=3).pack(side="left", padx=8)
+                      command=lambda r=rt: self._rate(r), width=8, height=2).pack(side="left", padx=4)
+        # 隐藏提交按钮，显示下一题按钮
+        self.submit_btn.pack_forget()
+        self.next_btn.config(state="normal")
 
     def _build_done(self):
         self._clear()
@@ -491,26 +540,55 @@ class FSRSApp:
                 d['new_card_ptr'] += 1
         return due
 
-    def _next_q(self):
-        d = self._active_deck()
-        if not d:
-            self._build_welcome()
+    def _go_next(self):
+        """下一题：如果当前题已答但未评分，需先评分"""
+        if self.answered and self._last_rating is None and self.current_card is not None:
+            messagebox.showwarning("提示", "请先评价记忆情况！")
             return
-        due = self._get_due()
-        if not due:
+        self.session_index += 1
+        if self.session_index >= len(self.session_queue):
             self._save_all()
             self._build_done()
             return
-        self.current_question, self.current_card = due[0]
+        self.answered = False
+        self._last_rating = None
+        self.current_question, self.current_card = self.session_queue[self.session_index]
         self.current_user_answer = []
-        self.progress_label.config(text=f"剩余：{len(due)}")
+        self._render_question()
+
+    def _go_prev(self):
+        """上一题：回看已做过的题目"""
+        if self.session_index <= 0:
+            return
+        self.session_index -= 1
+        self.current_question, self.current_card = self.session_queue[self.session_index]
+        self.answered = True  # 标记为已答（回看模式）
+        self._last_rating = True  # 标记已评分，允许翻页
+        self._render_question()
+        # 直接显示答案
+        self._show_answer_only()
+
+    def _render_question(self):
+        """渲染当前题目到界面"""
+        d = self._active_deck()
+        if not d or not self.current_question:
+            return
+        remaining = len(self.session_queue) - self.session_index
+        self.progress_label.config(text=f"剩余：{remaining}")
         self.stats_top.config(text=f"已做：{self.session_stats['done']} | 答对：{self.session_stats['ok']} | 答错：{self.session_stats['ng']}")
-        self.day_label.config(text=f"[{d['deck_name']}] 第 {d['current_day']+1} 天 / 共 {d['study_days']} 天")
+        self.day_label.config(text=f"[{d['deck_name']}] 第 {d['current_day']+1} 天 / 共 {d['study_days']} 天 ({self.session_index+1}/{len(self.session_queue)})")
         tn = {"single": "单选题", "multiple": "多选题", "judge": "判断题"}
         self.type_label.config(text=tn.get(self.current_question.type, self.current_question.type))
         self.question_label.config(text=self.current_question.question)
+        # 清空旧选项和反馈
         for w in self.options_frame.winfo_children():
             w.destroy()
+        for w in self.feedback_frame.winfo_children():
+            w.destroy()
+        for w in self.rating_frame.winfo_children():
+            w.destroy()
+        self.feedback_frame.pack_forget()
+        self.rating_frame.pack_forget()
         self.option_vars = []
         is_multi = self.current_question.type == "multiple"
         for i, opt in enumerate(self.current_question.options):
@@ -524,9 +602,36 @@ class FSRSApp:
                 tk.Radiobutton(self.options_frame, text=opt, variable=v, value=i+1, bg=CARD_BG,
                                activebackground=CARD_BG, font=Font(family=FF, size=11),
                                anchor="w", cursor="hand2").pack(fill="x", pady=3, anchor="w")
+        # 按钮状态
+        self.prev_btn.config(state="normal" if self.session_index > 0 else "disabled")
+        self.next_btn.config(state="disabled")
+        self.submit_btn.pack(side="left", padx=6)
+
+    def _show_answer_only(self):
+        """回看模式：只显示答案，不显示评分按钮"""
+        for w in self.feedback_frame.winfo_children():
+            w.destroy()
+        for w in self.rating_frame.winfo_children():
+            w.destroy()
+        self.feedback_frame.pack(fill="x", padx=20, pady=(8, 4))
+        tk.Label(self.feedback_frame, text="（回看模式）",
+                 bg=CARD_BG, font=Font(family=FF, size=9), fg="#999999",
+                 anchor="w").pack(fill="x", pady=(0, 4))
+        ua = self.current_user_answer or self.current_question.answer
+        ua_text = " / ".join(self.current_question.options[i] if i < len(self.current_question.options) else str(i) for i in sorted(ua))
+        tk.Label(self.feedback_frame, text=f"正确答案：{self.current_question.get_correct_text()}",
+                 bg=CARD_BG, font=Font(family=FF, size=11), fg=OK_CLR,
+                 anchor="w", wraplength=620, justify="left").pack(fill="x", pady=2)
+        if self.current_question.explanation:
+            tk.Label(self.feedback_frame, text=f"解析：{self.current_question.explanation}",
+                     bg=CARD_BG, font=Font(family=FF, size=10), fg="#666666",
+                     anchor="w", wraplength=620, justify="left").pack(fill="x", pady=(4, 0))
+        self.submit_btn.pack_forget()
+        self.next_btn.config(state="normal")
+        self.prev_btn.config(state="normal" if self.session_index > 0 else "disabled")
 
     def _submit(self):
-        if not self.current_question:
+        if not self.current_question or self.answered:
             return
         self.current_user_answer = [i for i, v in enumerate(self.option_vars) if v.get()]
         if not self.current_user_answer:
@@ -538,18 +643,27 @@ class FSRSApp:
             self.session_stats["ok"] += 1
         else:
             self.session_stats["ng"] += 1
+        self.answered = True
+        # 禁用选项（答题后不可更改）
+        for w in self.options_frame.winfo_children():
+            if isinstance(w, (tk.Checkbutton, tk.Radiobutton)):
+                w.config(state="disabled")
         self._build_feedback()
-        self.result_label.config(text="回答正确！" if ok else "回答错误！", foreground=OK_CLR if ok else NG_CLR)
-        ua = " / ".join(self.current_question.options[i] if i < len(self.current_question.options) else str(i) for i in sorted(self.current_user_answer))
-        self.ans_label.config(text=f"正确答案：{self.current_question.get_correct_text()}\n你的答案：{ua}")
-        self.explain_label.config(text=f"解析：{self.current_question.explanation}" if self.current_question.explanation else "")
+        self.stats_top.config(text=f"已做：{self.session_stats['done']} | 答对：{self.session_stats['ok']} | 答错：{self.session_stats['ng']}")
 
     def _rate(self, rating):
         if self.current_card is None:
             return
         self.scheduler.schedule(self.current_card, rating)
         self._save_all()
-        self._next_q()
+        self._last_rating = rating
+        # 评分后隐藏评分按钮，保留答案显示
+        for w in self.rating_frame.winfo_children():
+            w.destroy()
+        self.rating_frame.pack_forget()
+        tk.Label(self.feedback_frame, text="已评价 ✓", bg=CARD_BG,
+                 font=Font(family=FF, size=9), fg="#999999", anchor="w").pack(fill="x", pady=(4, 0))
+        self.next_btn.config(state="normal")
 
     def _end_study(self):
         self._save_all()
